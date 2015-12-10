@@ -1,0 +1,19 @@
+关于github灰色文件夹的问题:
+解决方法可参考: http://stackoverflow.com/questions/1084969/unable-to-track-files-within-git-submodules
+
+总结:
+1.Delete the relevant line from the .gitmodules file.
+2.Delete the relevant section from .git/config.
+3.Run git rm --cached path_to_submodule (no trailing slash).
+4.Commit
+
+我的方法:
+1.查找子模块是否包含.git文件夹，如果有，则删除
+2.查找子模块是否包含.gitmodules文件，如果有，则删除
+3.运行 git rm --cached 子模块路径
+4.git status 查看下当前状态， 会发现代待提交的操作中有删除  灰色文件夹
+5.git add 子模块
+6.git commit -m "原因" 
+7.git status
+8.git ls-files 看下这次是否包含了子模块
+9.git push 远端git地址
