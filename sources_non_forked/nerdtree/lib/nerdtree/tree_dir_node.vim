@@ -9,7 +9,7 @@ let g:NERDTreeDirNode = s:TreeDirNode
 "FUNCTION: TreeDirNode.AbsoluteTreeRoot(){{{1
 "class method that returns the highest cached ancestor of the current root
 function! s:TreeDirNode.AbsoluteTreeRoot()
-    let currentNode = b:NERDTree.root
+    let currentNode = b:NERDTreeRoot
     while currentNode.parent != {}
         let currentNode = currentNode.parent
     endwhile
@@ -21,7 +21,7 @@ unlet s:TreeDirNode.activate
 function! s:TreeDirNode.activate(...)
     let opts = a:0 ? a:1 : {}
     call self.toggleOpen(opts)
-    call self.getNerdtree().render()
+    call b:NERDTree.render()
     call self.putCursorHere(0, 0)
 endfunction
 
@@ -68,25 +68,9 @@ endfunction
 "Returns:
 "the newly created node
 function! s:TreeDirNode.createChild(path, inOrder)
-    let newTreeNode = g:NERDTreeFileNode.New(a:path, self.getNerdtree())
+    let newTreeNode = g:NERDTreeFileNode.New(a:path)
     call self.addChild(newTreeNode, a:inOrder)
     return newTreeNode
-endfunction
-
-"FUNCTION: TreeDirNode.displayString() {{{1
-unlet s:TreeDirNode.displayString
-function! s:TreeDirNode.displayString()
-    let cascade = self.getCascade()
-    let rv = ""
-    for node in cascade
-        let rv = rv . node.path.displayString()
-    endfor
-
-    let sym = cascade[-1].isOpen ? g:NERDTreeDirArrowCollapsible : g:NERDTreeDirArrowExpandable
-
-    let flags = cascade[-1].path.flagSet.renderToString()
-
-    return sym . ' ' . flags . rv
 endfunction
 
 "FUNCTION: TreeDirNode.findNode(path) {{{1
@@ -112,33 +96,6 @@ function! s:TreeDirNode.findNode(path)
         endfor
     endif
     return {}
-endfunction
-
-"FUNCTION: TreeDirNode.getCascade() {{{1
-"Return an array of dir nodes (starting from self) that can be cascade opened.
-function! s:TreeDirNode.getCascade()
-
-    let rv = [self]
-    let node = self
-
-    while 1
-        let vc = node.getVisibleChildren()
-        if len(vc) != 1
-            break
-        endif
-
-        let visChild = vc[0]
-
-        "TODO: optimize
-        if !visChild.path.isDirectory
-            break
-        endif
-
-        call add(rv, visChild)
-        let node = visChild
-    endwhile
-
-    return rv
 endfunction
 
 "FUNCTION: TreeDirNode.getChildCount() {{{1
@@ -214,12 +171,6 @@ function! s:TreeDirNode.getChildIndex(path)
     return -1
 endfunction
 
-"FUNCTION: TreeDirNode.getDirChildren() {{{1
-"Get all children that are directories
-function! s:TreeDirNode.getDirChildren()
-    return filter(self.children, 'v:val.path.isDirectory == 1')
-endfunction
-
 "FUNCTION: TreeDirNode.GetSelected() {{{1
 "Returns the current node if it is a dir node, or else returns the current
 "nodes parent
@@ -248,7 +199,7 @@ endfunction
 function! s:TreeDirNode.getVisibleChildren()
     let toReturn = []
     for i in self.children
-        if i.path.ignore(self.getNerdtree()) ==# 0
+        if i.path.ignore() ==# 0
             call add(toReturn, i)
         endif
     endfor
@@ -259,13 +210,6 @@ endfunction
 "returns 1 if this node has any childre, 0 otherwise..
 function! s:TreeDirNode.hasVisibleChildren()
     return self.getVisibleChildCount() != 0
-endfunction
-
-"FUNCTION: TreeDirNode.isCascadable() {{{1
-"true if this dir has only one visible child - which is also a dir
-function! s:TreeDirNode.isCascadable()
-    let c = self.getVisibleChildren()
-    return len(c) == 1 && c[0].path.isDirectory
 endfunction
 
 "FUNCTION: TreeDirNode._initChildren() {{{1
@@ -300,15 +244,19 @@ function! s:TreeDirNode._initChildren(silent)
     for i in files
 
         "filter out the .. and . directories
-        "Note: we must match .. AND ../ since sometimes the globpath returns
+        "Note: we must match .. AND ../ cos sometimes the globpath returns
         "../ for path with strange chars (eg $)
-        if i[len(i)-3:2] != ".." && i[len(i)-2:2] != ".." &&
+"        if i !~# '\/\.\.\/\?$' && i !~# '\/\.\/\?$'
+"
+        " Regular expression is too expensive. Use simply string comparison
+        " instead
+        if i[len(i)-3:2] != ".." && i[len(i)-2:2] != ".." && 
          \ i[len(i)-2:1] != "." && i[len(i)-1] != "."
             "put the next file in a new node and attach it
             try
                 let path = g:NERDTreePath.New(i)
                 call self.createChild(path, 0)
-                call g:NERDTreePathNotifier.NotifyListeners('init', path, self.getNerdtree(), {})
+                call g:NERDTreePathNotifier.NotifyListeners('init', path, {})
             catch /^NERDTree.\(InvalidArguments\|InvalidFiletype\)Error/
                 let invalidFilesFound += 1
             endtry
@@ -327,13 +275,13 @@ function! s:TreeDirNode._initChildren(silent)
     return self.getChildCount()
 endfunction
 
-"FUNCTION: TreeDirNode.New(path, nerdtree) {{{1
+"FUNCTION: TreeDirNode.New(path) {{{1
 "Returns a new TreeNode object with the given path and parent
 "
 "Args:
-"path: dir that the node represents
-"nerdtree: the tree the node belongs to
-function! s:TreeDirNode.New(path, nerdtree)
+"path: a path object representing the full filesystem path to the file/dir that the node represents
+unlet s:TreeDirNode.New
+function! s:TreeDirNode.New(path)
     if a:path.isDirectory != 1
         throw "NERDTree.InvalidArgumentsError: A TreeDirNode object must be instantiated with a directory Path object."
     endif
@@ -345,7 +293,6 @@ function! s:TreeDirNode.New(path, nerdtree)
     let newTreeNode.children = []
 
     let newTreeNode.parent = {}
-    let newTreeNode._nerdtree = a:nerdtree
 
     return newTreeNode
 endfunction
@@ -409,7 +356,7 @@ endfunction
 "FUNCTION: TreeDirNode._openInNewTab() {{{1
 function! s:TreeDirNode._openInNewTab()
     tabnew
-    call g:NERDTreeCreator.CreateTabTree(self.path.str())
+    call g:NERDTreeCreator.CreatePrimary(self.path.str())
 endfunction
 
 "FUNCTION: TreeDirNode.openRecursively() {{{1
@@ -430,7 +377,7 @@ endfunction
 "Args:
 "forceOpen: 1 if this node should be opened regardless of file filters
 function! s:TreeDirNode._openRecursively2(forceOpen)
-    if self.path.ignore(self.getNerdtree()) ==# 0 || a:forceOpen
+    if self.path.ignore() ==# 0 || a:forceOpen
         let self.isOpen = 1
         if self.children ==# []
             call self._initChildren(1)
@@ -447,7 +394,7 @@ endfunction
 "FUNCTION: TreeDirNode.refresh() {{{1
 unlet s:TreeDirNode.refresh
 function! s:TreeDirNode.refresh()
-    call self.path.refresh(self.getNerdtree())
+    call self.path.refresh()
 
     "if this node was ever opened, refresh its children
     if self.isOpen || !empty(self.children)
@@ -478,7 +425,7 @@ function! s:TreeDirNode.refresh()
 
                     "the node doesnt exist so create it
                     else
-                        let newNode = g:NERDTreeFileNode.New(path, self.getNerdtree())
+                        let newNode = g:NERDTreeFileNode.New(path)
                         let newNode.parent = self
                         call add(newChildNodes, newNode)
                     endif
@@ -503,7 +450,7 @@ endfunction
 "FUNCTION: TreeDirNode.refreshFlags() {{{1
 unlet s:TreeDirNode.refreshFlags
 function! s:TreeDirNode.refreshFlags()
-    call self.path.refreshFlags(self.getNerdtree())
+    call self.path.refreshFlags()
     for i in self.children
         call i.refreshFlags()
     endfor
@@ -511,16 +458,13 @@ endfunction
 
 "FUNCTION: TreeDirNode.refreshDirFlags() {{{1
 function! s:TreeDirNode.refreshDirFlags()
-    call self.path.refreshFlags(self.getNerdtree())
+    call self.path.refreshFlags()
 endfunction
 
 "FUNCTION: TreeDirNode.reveal(path) {{{1
 "reveal the given path, i.e. cache and open all treenodes needed to display it
 "in the UI
-"Returns the revealed node
-function! s:TreeDirNode.reveal(path, ...)
-    let opts = a:0 ? a:1 : {}
-
+function! s:TreeDirNode.reveal(path)
     if !a:path.isUnder(self.path)
         throw "NERDTree.InvalidArgumentsError: " . a:path.str() . " should be under " . self.path.str()
     endif
@@ -529,10 +473,9 @@ function! s:TreeDirNode.reveal(path, ...)
 
     if self.path.equals(a:path.getParent())
         let n = self.findNode(a:path)
-        if has_key(opts, "open")
-            call n.open()
-        endif
-        return n
+        call b:NERDTree.render()
+        call n.putCursorHere(1,0)
+        return
     endif
 
     let p = a:path
@@ -541,7 +484,7 @@ function! s:TreeDirNode.reveal(path, ...)
     endwhile
 
     let n = self.findNode(p)
-    return n.reveal(a:path, opts)
+    call n.reveal(a:path)
 endfunction
 
 "FUNCTION: TreeDirNode.removeChild(treenode) {{{1

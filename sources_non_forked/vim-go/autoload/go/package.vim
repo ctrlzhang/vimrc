@@ -66,8 +66,7 @@ function! go#package#ImportPath(arg)
         return -1
     endif
 
-    let srcdir = substitute(workspace . '/src/', '//', '/', '')
-    return substitute(path, srcdir, '', '')
+    return substitute(path, workspace . '/src/', '', '')
 endfunction
 
 function! go#package#FromPath(arg)

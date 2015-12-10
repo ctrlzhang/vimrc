@@ -1,361 +1,238 @@
 priority -50
 
-# This files will define django snippets from sublime text djaneiro
-# FORMS SNIPPETS
-
-snippet form "Form" b
-class ${1:FORMNAME}(forms.Form):
-
-	${2:# TODO: Define form fields here}
-endsnippet
-
-snippet modelform "ModelForm" b
-class ${1:MODELNAME}Form(forms.ModelForm):
-
-	class Meta:
-		model = $1
-endsnippet
-
-snippet fbool "BooleanField" b
-${1:FIELDNAME} = forms.BooleanField($2)
-endsnippet
-
-snippet fchar "CharField" b
-${1:FIELDNAME} = forms.CharField($2)
-endsnippet
-
-snippet fchoice "ChoiceField" b
-${1:FIELDNAME} = forms.ChoiceField($2)
-endsnippet
-
-snippet fcombo "ComboField" b
-${1:FIELDNAME} = forms.ComboField($2)
-endsnippet
-
-snippet fdate "DateField" b
-${1:FIELDNAME} = forms.DateField($2)
-endsnippet
-
-snippet fdatetime "DateTimeField" b
-${1:FIELDNAME} = forms.DateTimeField($2)
-endsnippet
-
-snippet fdecimal "DecimalField" b
-${1:FIELDNAME} = forms.DecimalField($2)
-endsnippet
-
-snippet fmail "EmailField" b
-${1:FIELDNAME} = forms.EmailField($2)
-endsnippet
-
-snippet ffile "FileField" b
-${1:FIELDNAME} = forms.FileField($2)
+# Generic Tags
+snippet %
+{% ${1} %}${2}
 endsnippet
 
-snippet ffilepath "FilePathField" b
-${1:FIELDNAME} = forms.FilePathField($2)
+snippet %%
+{% ${1:tag_name} %}
+	${2}
+{% end$1 %}
 endsnippet
 
-snippet ffloat "FloatField" b
-${1:FIELDNAME} = forms.FloatField($2)
+snippet {
+{{ ${1} }}${2}
 endsnippet
 
-snippet fip "IPAddressField" b
-${1:FIELDNAME} = forms.IPAddressField($2)
-endsnippet
-
-snippet fimg "ImageField" b
-${1:FIELDNAME} = forms.ImageField($2)
-endsnippet
-
-snippet fint "IntegerField" b
-${1:FIELDNAME} = forms.IntegerField($2)
-endsnippet
+# Template Tags
 
-snippet fmochoice "ModelChoiceField" b
-${1:FIELDNAME} = forms.ModelChoiceField($2)
+snippet autoescape
+{% autoescape ${1:off} %}
+	${2}
+{% endautoescape %}
 endsnippet
 
-snippet fmomuchoice "ModelMultipleChoiceField" b
-${1:FIELDNAME} = forms.ModelMultipleChoiceField($2)
+snippet block
+{% block ${1} %}
+	${2}
+{% endblock $1 %}
 endsnippet
 
-snippet fmuval "MultiValueField" b
-${1:FIELDNAME} = forms.MultiValueField($2)
+snippet #
+{# ${1:comment} #}
 endsnippet
 
-snippet fmuchoice "MultipleChoiceField" b
-${1:FIELDNAME} = forms.MultipleChoiceField($2)
+snippet comment
+{% comment %}
+	${1}
+{% endcomment %}
 endsnippet
 
-snippet fnullbool "NullBooleanField" b
-${1:FIELDNAME} = forms.NullBooleanField($2)
+snippet cycle
+{% cycle ${1:val1} ${2:val2} ${3:as ${4}} %}
 endsnippet
 
-snippet freg "RegexField" b
-${1:FIELDNAME} = forms.RegexField($2)
+snippet debug
+{% debug %}
 endsnippet
 
-snippet fslug "SlugField" b
-${1:FIELDNAME} = forms.SlugField($2)
+snippet extends
+{% extends "${1:base.html}" %}
 endsnippet
 
-snippet fsdatetime "SplitDateTimeField" b
-${1:FIELDNAME} = forms.SplitDateTimeField($2)
+snippet filter
+{% filter ${1} %}
+	${2}
+{% endfilter %}
 endsnippet
 
-snippet ftime "TimeField" b
-${1:FIELDNAME} = forms.TimeField($2)
+snippet firstof
+{% firstof ${1} %}
 endsnippet
 
-snippet ftchoice "TypedChoiceField" b
-${1:FIELDNAME} = forms.TypedChoiceField($2)
+snippet for
+{% for ${1} in ${2} %}
+	${3}
+{% endfor %}
 endsnippet
-
-snippet ftmuchoice "TypedMultipleChoiceField" b
-${1:FIELDNAME} = forms.TypedMultipleChoiceField($2)
-endsnippet
-
-snippet furl "URLField" b
-${1:FIELDNAME} = forms.URLField($2)
-endsnippet
-
-# MODELS SNIPPETS
-
-snippet model "Model" b
-class ${1:MODELNAME}(models.Model):
-	${0}
-	class Meta:
-		verbose_name = "$1"
-		verbose_name_plural = "$1s"
 
-	def __str__(self):
-		return super($1, self).__str__()
-
+snippet empty
+{% empty %}
+	${1}
 endsnippet
-
-snippet modelfull "Model" b
-class ${1:MODELNAME}(models.Model):
-	${2:# TODO: Define fields here}
-
-	class Meta:
-		verbose_name = "$1"
-		verbose_name_plural = "$1s"
-
-	def __str__(self):
-		return super($1, self).__str__()
-
-	def save(self):
-		return super($1, self).save()
-
-	@models.permalink
-	def get_absolute_url(self):
-		return ('')
 
-	${3:# TODO: Define custom methods here}
-
+snippet if
+{% if ${1} %}
+	${2}
+{% endif %}
 endsnippet
 
-snippet mauto "AutoField" b
-${1:FIELDNAME} = models.AutoField($2)
+snippet else
+{% else %}
+	${1}
 endsnippet
 
-snippet mbigint "BigIntegerField" b
-${1:FIELDNAME} = models.BigIntegerField($2)
+snippet ifchanged
+{% ifchanged %}${1}{% endifchanged %}
 endsnippet
 
-snippet mbool "BooleanField" b
-${1:FIELDNAME} = models.BooleanField($2)
+snippet ifequal
+{% ifequal ${1} ${2} %}
+	${3}
+{% endifequal %}
 endsnippet
 
-snippet mchar "CharField" b
-${1:FIELDNAME} = models.CharField($2, max_length=${3:50})
+snippet ifnotequal
+{% ifnotequal ${1} ${2} %}
+	${3}
+{% endifnotequal %}
 endsnippet
 
-snippet mcoseint "CommaSeparatedIntegerField" b
-${1:FIELDNAME} = models.CommaSeparatedIntegerField($2)
+snippet include
+{% include "${1}" %}
 endsnippet
 
-snippet mdate "DateField" b
-${1:FIELDNAME} = models.DateField($2)
+snippet load
+{% load ${1} %}
 endsnippet
 
-snippet mdatetime "DateTimeField" b
-${1:FIELDNAME} = models.DateTimeField($2)
+snippet now
+{% now "${1:jS F Y H:i}" %}
 endsnippet
 
-snippet mdecimal "DecimalField" b
-${1:FIELDNAME} = models.DateTimeField($2)
+snippet regroup
+{% regroup ${1} by ${2} as ${3} %}
 endsnippet
 
-snippet memail "EmailField" b
-${1:FIELDNAME} = models.EmailField($2)
+snippet spaceless
+{% spaceless %}${1}{% endspaceless %}
 endsnippet
 
-snippet mfile "FileField" b
-${1:FIELDNAME} = models.FileField($2)
+snippet ssi
+{% ssi ${1} %}
 endsnippet
 
-snippet mfilepath "FilePathField" b
-${1:FIELDNAME} = models.FilePathField($2)
+snippet trans
+{% trans "${1:string}" %}
 endsnippet
 
-snippet mfloat "FloatField" b
-${1:FIELDNAME} = models.FloatField($2)
+snippet url
+{% url ${1} as ${2} %}
 endsnippet
 
-snippet fk "ForeignKey" b
-${1:FIELDNAME} = models.ForeignKey($2)
+snippet widthratio
+{% widthratio ${1:this_value} ${2:max_value} ${3:100} %}
 endsnippet
 
-snippet mip "IPAddressField" b
-${1:FIELDNAME} = models.IPAddressField($2)
+snippet with
+{% with ${1} as ${2} %}
 endsnippet
 
-snippet mimg "ImageField" b
-${1:FIELDNAME} = models.ImageField($2)
-endsnippet
+# Template Filters
 
-snippet mint "IntegerField" b
-${1:FIELDNAME} = models.IntegerField($2)
-endsnippet
+# Note: Since SnipMate can't determine which template filter you are
+# expanding without the "|" character, these do not add the "|"
+# character.  These save a few keystrokes still.
 
-snippet m2m "ManyToManyField" b
-${1:FIELDNAME} = models.ManyToManyField($2)
-endsnippet
+# Note: Template tags that take no arguments are not implemented.
 
-snippet mnullbool "NullBooleanField" b
-${1:FIELDNAME} = models.NullBooleanField($2)
+snippet add
+add:"${1}"
 endsnippet
 
-snippet o2o "OneToOneField" b
-${1:FIELDNAME} = models.OneToOneField($2)
+snippet center
+center:"${1}"
 endsnippet
 
-snippet mphone "PhoneNumberField" b
-${1:FIELDNAME} = models.PhoneNumberField($2)
+snippet cut
+cut:"${1}"
 endsnippet
 
-snippet mposint "PositiveIntegerField" b
-${1:FIELDNAME} = models.PositiveIntegerField($2)
+snippet date
+date:"${1}"
 endsnippet
 
-snippet mpossmallint "PositiveSmallIntegerField" b
-${1:FIELDNAME} = models.PositiveSmallIntegerField($2)
+snippet default
+default:"${1}"
 endsnippet
 
-snippet mslug "SlugField" b
-${1:FIELDNAME} = models.SlugField($2)
+snippet defaultifnone
+default_if_none:"${1}"
 endsnippet
 
-snippet msmallint "SmallIntegerField" b
-${1:FIELDNAME} = models.SmallIntegerField($2)
+snippet dictsort
+dictsort:"${1}"
 endsnippet
 
-snippet mtext "TextField" b
-${1:FIELDNAME} = models.TextField($2)
+snippet dictsortrev
+dictsortreversed:"${1}"
 endsnippet
 
-snippet mtime "TimeField" b
-${1:FIELDNAME} = models.TimeField($2)
+snippet divisibleby
+divisibleby:"${1}"
 endsnippet
 
-snippet murl "URLField" b
-${1:FIELDNAME} = models.URLField($2)
+snippet floatformat
+floatformat:"${1}"
 endsnippet
 
-snippet musstate "USStateField" b
-${1:FIELDNAME} = models.USStateField($2)
+snippet getdigit
+get_digit:"${1}"
 endsnippet
 
-snippet mxml "XMLField" b
-${1:FIELDNAME} = models.XMLField($2)
+snippet join
+join:"${1}"
 endsnippet
 
-# VIEWS SNIPPETS
-
-snippet adminview "Model Admin View" b
-class ${1}Admin(admin.ModelAdmin):
-	'''
-		Admin View for ${1}
-	'''
-	list_display = ('${2}',)
-	list_filter = ('${3}',)
-	inlines = [
-		${4}Inline,
-	]
-	raw_id_fields = ('${5}',)
-	readonly_fields = ('${6}',)
-	search_fields = ['${7}']
-admin.site.register(${1}, ${1}Admin)
+snippet lengthis
+length_is:"${1}"
 endsnippet
 
-snippet createview "Generic Create View" b
-class ${1:MODEL_NAME}CreateView(CreateView):
-	model = ${1:MODEL_NAME}
-	template_name = "${2:TEMPLATE_NAME}"
+snippet pluralize
+pluralize:"${1}"
 endsnippet
 
-snippet deleteview "Generic Delete View" b
-class ${1:MODEL_NAME}DeleteView(DeleteView):
-	model = ${1:MODEL_NAME}
-	template_name = "${2:TEMPLATE_NAME}"
+snippet removetags
+removetags:"${1}"
 endsnippet
 
-snippet detailview "Generic Detail View" b
-class ${1:MODEL_NAME}DetailView(DetailView):
-	model = ${1:MODEL_NAME}
-	template_name = "${2:TEMPLATE_NAME}"
+snippet slice
+slice:"${1}"
 endsnippet
 
-snippet listview "Generic List View" b
-class ${1:MODEL_NAME}ListView(ListView):
-	model = ${1:MODEL_NAME}
-	template_name = "${2:TEMPLATE_NAME}"
+snippet stringformat
+stringformat:"${1}"
 endsnippet
 
-snippet stackedinline "Stacked Inline" b
-class ${1}Inline(admin.StackedInline):
-	'''
-	Stacked Inline View for ${1}
-	'''
-	model = ${2:${1}}
-	min_num = ${3:3}
-	max_num = ${4:20}
-	extra = ${5:1}
-	raw_id_fields = (${6},)
+snippet time
+time:"${1}"
 endsnippet
 
-snippet tabularinline "Tabular Inline" b
-class ${1}Inline(admin.TabularInline):
-	'''
-	Tabular Inline View for ${1}
-	'''
-	model = ${2:${1}}
-	min_num = ${3:3}
-	max_num = ${4:20}
-	extra = ${5:1}
-	raw_id_fields = (${6},)
+snippet truncatewords
+truncatewords:${1}
 endsnippet
 
-snippet templateview "Generic Template View" b
-class ${1:CLASS_NAME}(TemplateView):
-	template_name = "${2:TEMPLATE_NAME}"
+snippet truncatewordshtml
+truncatewords_html:${1}
 endsnippet
 
-snippet updateview "Generic Update View" b
-class ${1:MODEL_NAME}UpdateView(UpdateView):
-	model = ${1:MODEL_NAME}
-	template_name = "${2:TEMPLATE_NAME}"
+snippet urlizetrunc
+urlizetrunc:${1}
 endsnippet
 
-snippet dispatch "Dispatch View method" b
-def dispatch(self, request, *args, **kwargs):
-	return super(${1:CLASS_NAME}, self).dispatch(request, *args, **kwargs)
+snippet wordwrap
+wordwrap:${1}
 endsnippet
 
-snippet context "get_context_data view method" b
-def get_context_data(self, **kwargs):
-	kwargs['extra_context'] = ${1:'New Value'}
-	return super(${2:CLASS_NAME}, self).get_context_data(**kwargs)
-endsnippet
+# vim:ft=snippets:

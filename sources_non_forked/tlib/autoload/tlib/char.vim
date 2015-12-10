@@ -1,7 +1,15 @@
+" char.vim
 " @Author:      Tom Link (micathom AT gmail com?subject=[vim])
 " @Website:     http://www.vim.org/account/profile.php?user_id=4037
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
-" @Revision:    38
+" @Created:     2007-06-30.
+" @Last Change: 2014-01-20.
+" @Revision:    0.0.37
+
+if &cp || exists("loaded_tlib_char_autoload")
+    finish
+endif
+let loaded_tlib_char_autoload = 1
 
 
 " :def: function! tlib#char#Get(?timeout=0)

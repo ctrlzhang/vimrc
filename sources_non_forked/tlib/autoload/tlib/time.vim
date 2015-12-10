@@ -1,7 +1,15 @@
+" time.vim
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @Website:     http://www.vim.org/account/profile.php?user_id=4037
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
-" @Revision:    36
+" @Created:     2007-10-17.
+" @Last Change: 2009-02-22.
+" @Revision:    0.0.29
+
+if &cp || exists("loaded_tlib_time_autoload")
+    finish
+endif
+let loaded_tlib_time_autoload = 1
 
 
 function! tlib#time#MSecs() "{{{3
@@ -11,24 +19,9 @@ endf
 
 
 function! tlib#time#Now() "{{{3
-    if has('reltime')
-        let rts = reltimestr(reltime())
-        let rtl = map(split(rts, '\.'), 'str2nr(v:val)')
-    else
-        let rtl = [localtime()]
-    endif
+    let rts = reltimestr(reltime())
+    let rtl = split(rts, '\.')
     return rtl
-endf
-
-
-function! tlib#time#FormatNow() "{{{3
-    let rtl = tlib#time#Now()
-    if len(rtl) == 2
-        let rts = strftime(g:tlib#date#date_format .' %H:%M:%S', rtl[0]) .'.'. rtl[1]
-    else
-        let rts = strftime(g:tlib#date#date_format .' %H:%M:%S', rtl[0])
-    endif
-    return rts
 endf
 
 

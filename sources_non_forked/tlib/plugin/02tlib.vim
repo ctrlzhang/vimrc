@@ -1,23 +1,45 @@
 " @Author:      Tom Link (micathom AT gmail com?subject=[vim])
 " @Created:     2007-04-10.
-" @Last Change: 2015-11-23.
+" @Last Change: 2014-07-03.
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
-" @Revision:    808
+" @Revision:    754
 " @Website:     http://www.vim.org/account/profile.php?user_id=4037
 " GetLatestVimScripts: 1863 1 tlib.vim
 " tlib.vim -- Some utility functions
 
-if &cp || exists("g:loaded_tlib")
+if &cp || exists("loaded_tlib")
     finish
 endif
 if v:version < 700 "{{{2
     echoerr "tlib requires Vim >= 7"
     finish
 endif
-let g:loaded_tlib = 117
+let loaded_tlib = 113
 
 let s:save_cpo = &cpo
 set cpo&vim
+
+
+" Init~ {{{1
+" call tlib#autocmdgroup#Init()
+
+
+" Commands~ {{{1
+
+" :display: :TRequire NAME [VERSION [FILE]]
+" Make a certain vim file is loaded.
+"
+" Conventions: If FILE isn't defined, plugin/NAME.vim is loaded. The 
+" file must provide a variable loaded_{NAME} that represents the version 
+" number.
+command! -nargs=+ TRequire let s:require = [<f-args>]
+            \ | if !exists('loaded_'. get(s:require, 0))
+                \ | exec 'runtime '. get(s:require, 2, 'plugin/'. get(s:require, 0) .'.vim')
+                \ | if !exists('loaded_'. get(s:require, 0)) || loaded_{get(s:require, 0)} < get(s:require, 1, loaded_{get(s:require, 0)})
+                    \ | echoerr 'Require '.  get(s:require, 0) .' >= '. get(s:require, 1, 'any version will do')
+                    \ | finish
+                    \ | endif
+                \ | endif | unlet s:require
 
 
 " :display: :TLet VAR = VALUE
@@ -37,7 +59,7 @@ command! -nargs=+ TLet if !exists(matchstr(<q-args>, '^[^=[:space:]]\+')) | exec
 " EXAMPLES: >
 "   TScratch 'scratch': '__FOO__'
 "   => Open a scratch buffer named __FOO__
-command! -bar -nargs=* -bang TScratch call tlib#scratch#UseScratch({'scratch_split': empty('<bang>'), <args>})
+command! -bar -nargs=* -bang TScratch call tlib#scratch#UseScratch({'scratch_split': '<bang>' != '!', <args>})
 
 
 " :display: :TVarArg VAR1, [VAR2, DEFAULT2] ...
@@ -49,6 +71,17 @@ command! -bar -nargs=* -bang TScratch call tlib#scratch#UseScratch({'scratch_spl
 "       echo 'b='. b
 "   endf
 command! -nargs=+ TVarArg exec tlib#arg#Let([<args>])
+
+
+" :display: :TKeyArg DICT, VAR1, [VAR2, DEFAULT2] ...
+" A convenience wrapper for |tlib#arg#Let|.
+" EXAMPLES: >
+"   function! Foo(keyargs)
+"       TKeyArg a:keyargs, ['a', 1], 'b'
+"       echo 'a='. a
+"       echo 'b='. b
+"   endf
+command! -nargs=+ TKeyArg exec tlib#arg#Key([<args>])
 
 
 " :display: :TBrowseOutput COMMAND
@@ -65,7 +98,6 @@ command! -nargs=+ TVarArg exec tlib#arg#Let([<args>])
 "   TBrowseOutput 20verb TeaseTheCulprit
 command! -nargs=1 -complete=command TBrowseOutput call tlib#cmd#BrowseOutput(<q-args>)
 
-
 " :display: :TBrowseScriptnames
 " List all sourced script names (the output of ':scriptnames').
 "
@@ -74,28 +106,12 @@ command! -nargs=1 -complete=command TBrowseOutput call tlib#cmd#BrowseOutput(<q-
 "
 " EXAMPLES: >
 "   TBrowseScriptnames 
-command! -nargs=0 -complete=command TBrowseScriptnames call tlib#cmd#TBrowseScriptnames()
+command! -nargs=0 -complete=command TBrowseScriptnames call
+            \ tlib#cmd#BrowseOutputWithCallback("tlib#cmd#ParseScriptname", "scriptnames")
 
-
-" :display: :Tlibtrace GUARD, VAR1, VAR2...
-" Do nothing unless |tlib#trace#Enable()| was called.
-" 
-" When |:Tlibtraceset| or |tlib#trace#Enable()| were called:
-"
-" If GUARD is a number that evaluates to true or if it is a string that 
-" matches a |regexp|, which was added using Tlibtrace! (with '!'), 
-" display the values of VAR1, VAR2 ...
-command! -nargs=+ -bang -bar Tlibtrace :
-
-
-" :Tlibtraceset +RX1, -RX2...
-" If |tlib#trace#Enable()| was called: With the optional <bang>, users 
-" can add and remove GUARDs (actually a |regexp|) that should be traced.
-command! -nargs=+ -bang -bar Tlibtraceset call tlib#trace#Set(<q-args>)
-
-
-" :display: :Tlibtrace ASSERTION
-command! -nargs=+ -bang -bar Tlibassert :
+" :display: :TTimeCommand CMD
+" Time the execution time of CMD.
+command! -nargs=1 -complete=command TTimeCommand call tlib#cmd#Time(<q-args>)
 
 
 let &cpo = s:save_cpo

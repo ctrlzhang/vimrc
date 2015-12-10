@@ -1,7 +1,17 @@
+" comments.vim
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @Website:     http://www.vim.org/account/profile.php?user_id=4037
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
-" @Revision:    25
+" @Created:     2007-11-15.
+" @Last Change: 2009-02-15.
+" @Revision:    0.0.24
+
+if &cp || exists("loaded_tlib_comments_autoload")
+    finish
+endif
+let loaded_tlib_comments_autoload = 1
+let s:save_cpo = &cpo
+set cpo&vim
 
 
 " function! tlib#comments#Comments(?rx='')
@@ -24,3 +34,24 @@ function! tlib#comments#Comments(...)
 endf
 
 
+" function! tlib#comments#PartitionLine(line) "{{{3
+"     if !empty(&commentstring)
+"         let cs = '^\(\s*\)\('. printf(tlib#rx#Escape(&commentstring), '\)\(.\{-}\)\(') .'\)\(.*\)$'
+"         let ml = matchlist(a:line, cs)
+"     else
+"         let ml = []
+"     endif
+"     if !empty(ml)
+"         let [m_0, pre, open, line, close, post; rest] = ml
+"     else
+"         let [m_0, pre, line; rest] = matchstr(a:line, '^\(\s*\)\(.*\)$')
+"         for [key, val] in tlib#comments#Comments()
+"             if +++
+"         endfor
+"     endif
+"     return {'pre': pre, 'open': open, 'line': line, 'close': close, 'post': post}
+" endf
+
+
+let &cpo = s:save_cpo
+unlet s:save_cpo

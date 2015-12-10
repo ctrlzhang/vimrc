@@ -223,9 +223,6 @@ fun! snipMate#ReadSnippetsFile(file) abort
 		if line[:6] == 'snippet'
 			let inSnip = 1
 			let bang = (line[7] == '!')
-			if bang
-				let bang += line[8] == '!'
-			endif
 			let trigger = strpart(line, 8 + bang)
 			let name = ''
 			let space = stridx(trigger, ' ') + 1
@@ -339,10 +336,7 @@ endfunction
 
 function! snipMate#SetByPath(dict, trigger, path, snippet, bang, snipversion) abort
 	let d = a:dict
-	if a:bang == 2
-		unlet! d[a:trigger]
-		return
-	elseif !has_key(d, a:trigger) || a:bang == 1
+	if !has_key(d, a:trigger) || a:bang
 		let d[a:trigger] = {}
 	endif
 	let d[a:trigger][a:path] = [a:snippet, a:snipversion]
@@ -440,13 +434,14 @@ endf
 
 " used by both: completion and insert snippet
 fun! snipMate#GetSnippetsForWordBelowCursor(word, exact) abort
-	" Split non-word characters into their own piece
-	" so 'foo.bar..baz' becomes ['foo', '.', 'bar', '.', '.', 'baz']
-	" First split just after a \W and then split each resultant string just
-	" before a \W
-	let parts = filter(tlib#list#Flatten(
-				\ map(split(a:word, '\W\zs'), 'split(v:val, "\\ze\\W")')),
-				\ '!empty(v:val)')
+	" Setup lookups: '1.2.3' becomes [1.2.3] + [3, 2.3]
+	let parts = split(a:word, '\W\zs')
+	" Since '\W\zs' results in splitting *after* a non-keyword character, the
+	" first \W stays connected to whatever's before it, so split it off
+	if !empty(parts) && parts[0] =~ '\W$'
+		let parts = [ parts[0][:-2], strpart(parts[0], len(parts[0]) - 1) ]
+					\ + parts[1:]
+	endif
 	" Only look at the last few possibilities. Too many can be slow.
 	if len(parts) > 5
 		let parts = parts[-5:]

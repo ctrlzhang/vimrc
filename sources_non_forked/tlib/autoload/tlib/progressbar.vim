@@ -1,7 +1,15 @@
+" progressbar.vim
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @Website:     http://www.vim.org/account/profile.php?user_id=4037
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
-" @Revision:    72
+" @Created:     2007-09-30.
+" @Last Change: 2010-01-07.
+" @Revision:    0.0.69
+
+if &cp || exists("loaded_tlib_progressbar_autoload")
+    finish
+endif
+let loaded_tlib_progressbar_autoload = 1
 
 let s:statusline = []
 let s:laststatus = []
@@ -35,15 +43,15 @@ endf
 
 
 function! tlib#progressbar#Display(value, ...) "{{{3
-    TVarArg 'extra', ['always', 0]
+    TVarArg 'extra'
     let ts = localtime()
-    if !always && ts == s:timestamp
+    if ts == s:timestamp
         return
     else
         let s:timestamp = ts
     endif
     let val = a:value * s:width[0] / s:max[0]
-    if always || val != s:value[0]
+    if val != s:value[0]
         let s:value[0] = val
         let pbl = repeat('#', val)
         let pbr = repeat('.', s:width[0] - val)

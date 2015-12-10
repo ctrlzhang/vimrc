@@ -269,9 +269,7 @@ function! s:goyo_on(dim)
   if exists('g:goyo_callbacks[0]')
     call g:goyo_callbacks[0]()
   endif
-  if exists('#User#GoyoEnter')
-    doautocmd User GoyoEnter
-  endif
+  silent! doautocmd User GoyoEnter
 endfunction
 
 function! s:goyo_off()
@@ -346,9 +344,6 @@ function! s:goyo_off()
 
   if goyo_disabled_airline && !exists("#airline")
     AirlineToggle
-    " For some reason, Airline requires two refreshes to avoid display
-    " artifacts
-    silent! AirlineRefresh
     silent! AirlineRefresh
   endif
 
@@ -368,9 +363,7 @@ function! s:goyo_off()
   if exists('g:goyo_callbacks[1]')
     call g:goyo_callbacks[1]()
   endif
-  if exists('#User#GoyoLeave')
-    doautocmd User GoyoLeave
-  endif
+  silent! doautocmd User GoyoLeave
 endfunction
 
 function! s:relsz(expr, limit)
@@ -421,10 +414,6 @@ function! goyo#execute(bang, dim)
     if exists('#goyo') == 0
       call s:goyo_on(a:dim)
     elseif !empty(a:dim)
-      if winnr('$') < 5
-        call s:goyo_off()
-        return goyo#execute(a:bang, a:dim)
-      endif
       let dim = s:parse_arg(a:dim)
       if !empty(dim)
         let t:goyo_dim = dim

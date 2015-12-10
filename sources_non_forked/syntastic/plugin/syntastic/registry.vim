@@ -8,8 +8,7 @@ let g:loaded_syntastic_registry = 1
 let s:_DEFAULT_CHECKERS = {
         \ 'actionscript':  ['mxmlc'],
         \ 'ada':           ['gcc'],
-        \ 'ansible':       ['ansible_lint'],
-        \ 'apiblueprint':  ['drafter'],
+        \ 'apiblueprint':  ['snowcrash'],
         \ 'applescript':   ['osacompile'],
         \ 'asciidoc':      ['asciidoc'],
         \ 'asm':           ['gcc'],
@@ -30,7 +29,6 @@ let s:_DEFAULT_CHECKERS = {
         \ 'd':             ['dmd'],
         \ 'dart':          ['dartanalyzer'],
         \ 'docbk':         ['xmllint'],
-        \ 'dockerfile':    ['dockerfile_lint'],
         \ 'dustjs':        ['swiffer'],
         \ 'elixir':        [],
         \ 'erlang':        ['escript'],
@@ -44,7 +42,6 @@ let s:_DEFAULT_CHECKERS = {
         \ 'haxe':          ['haxe'],
         \ 'hss':           ['hss'],
         \ 'html':          ['tidy'],
-        \ 'jade':          ['jade_lint'],
         \ 'java':          ['javac'],
         \ 'javascript':    ['jshint', 'jslint'],
         \ 'json':          ['jsonlint', 'jsonval'],
@@ -69,9 +66,7 @@ let s:_DEFAULT_CHECKERS = {
         \ 'pod':           ['podchecker'],
         \ 'puppet':        ['puppet', 'puppetlint'],
         \ 'python':        ['python', 'flake8', 'pylint'],
-        \ 'qml':           ['qmllint'],
         \ 'r':             [],
-        \ 'rmd':           [],
         \ 'racket':        ['racket'],
         \ 'rnc':           ['rnv'],
         \ 'rst':           ['rst2pseudoxml'],
@@ -83,8 +78,6 @@ let s:_DEFAULT_CHECKERS = {
         \ 'slim':          ['slimrb'],
         \ 'sml':           ['smlnj'],
         \ 'spec':          ['rpmlint'],
-        \ 'sql':           ['sqlint'],
-        \ 'stylus':        ['stylint'],
         \ 'tcl':           ['nagelfar'],
         \ 'tex':           ['lacheck', 'chktex'],
         \ 'texinfo':       ['makeinfo'],
@@ -98,7 +91,6 @@ let s:_DEFAULT_CHECKERS = {
         \ 'xhtml':         ['tidy'],
         \ 'xml':           ['xmllint'],
         \ 'xslt':          ['xmllint'],
-        \ 'xquery':        ['basex'],
         \ 'yacc':          ['bison'],
         \ 'yaml':          ['jsyaml'],
         \ 'z80':           ['z80syntaxchecker'],
@@ -159,21 +151,8 @@ function! g:SyntasticRegistry.Instance() abort " {{{2
 endfunction " }}}2
 
 function! g:SyntasticRegistry.CreateAndRegisterChecker(args) abort " {{{2
+    let checker = g:SyntasticChecker.New(a:args)
     let registry = g:SyntasticRegistry.Instance()
-
-    if has_key(a:args, 'redirect')
-        let [ft, name] = split(a:args['redirect'], '/')
-        call registry._loadCheckersFor(ft)
-
-        let clone = get(registry._checkerMap[ft], name, {})
-        if empty(clone)
-            throw 'Syntastic: Checker ' . a:args['redirect'] . ' redirects to unregistered checker ' . ft . '/' . name
-        endif
-
-        let checker = g:SyntasticChecker.New(a:args, clone)
-    else
-        let checker = g:SyntasticChecker.New(a:args)
-    endif
     call registry._registerChecker(checker)
 endfunction " }}}2
 
@@ -208,7 +187,7 @@ function! g:SyntasticRegistry.getCheckersAvailable(ftalias, hints_list) abort " 
     return filter(self.getCheckers(a:ftalias, a:hints_list), 'v:val.isAvailable()')
 endfunction " }}}2
 
-" Same as getCheckers(), but keep only the checkers that are available and
+" Same as getCheckers(), but keep only the checkers tyhat are available and
 " disabled.  This runs the corresponding IsAvailable() functions for all checkers.
 function! g:SyntasticRegistry.getCheckersDisabled(ftalias, hints_list) abort " {{{2
     return filter(self.getCheckers(a:ftalias, a:hints_list), 'v:val.isDisabled() && v:val.isAvailable()')

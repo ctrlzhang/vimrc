@@ -1,7 +1,15 @@
+" rx.vim
 " @Author:      Tom Link (micathom AT gmail com?subject=[vim])
 " @Website:     http://www.vim.org/account/profile.php?user_id=4037
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
-" @Revision:    113
+" @Created:     2007-07-20.
+" @Last Change: 2010-02-26.
+" @Revision:    0.0.28
+
+if &cp || exists("loaded_tlib_rx_autoload")
+    finish
+endif
+let loaded_tlib_rx_autoload = 1
 
 
 " :def: function! tlib#rx#Escape(text, ?magic='m')
@@ -51,10 +59,5 @@ function! tlib#rx#Suffixes(...) "{{{3
     else
         return '\('. join(sfx, '\|') .'\)$'
     endif
-endf
-
-
-function! tlib#rx#LooksLikeRegexp(text) abort "{{{3
-    return a:text =~ '[.?*+{}\[\]]'
 endf
 

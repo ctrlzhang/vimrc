@@ -1,7 +1,15 @@
+" cmd.vim
 " @Author:      Tom Link (micathom AT gmail com?subject=[vim])
 " @Website:     http://www.vim.org/account/profile.php?user_id=4037
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
-" @Revision:    58
+" @Created:     2007-08-23.
+" @Last Change: 2014-10-21.
+" @Revision:    0.0.54
+
+if &cp || exists("loaded_tlib_cmd_autoload")
+    finish
+endif
+let loaded_tlib_cmd_autoload = 1
 
 
 let g:tlib#cmd#last_output = []
@@ -68,12 +76,6 @@ function! tlib#cmd#ParseScriptname(line) "{{{3
     let parsedValue = matchstr(a:line, '^\s*\d\+:\s*\zs.*$')
     exe 'drop '. fnameescape(parsedValue)
 endf
-
-
-function! tlib#cmd#TBrowseScriptnames() abort "{{{3
-   call tlib#cmd#BrowseOutputWithCallback("tlib#cmd#ParseScriptname", "scriptnames")
-endf
-
 
 " :def: function! tlib#cmd#UseVertical(?rx='')
 " Look at the history whether the command was called with vertical. If 
